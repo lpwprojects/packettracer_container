@@ -17,6 +17,8 @@ cp ./Packet_Tracer821_amd64_signed.deb /tmp/share/
 
 # Build the image and start new container
 
+Adding a shared volume to the container to install the app and also share files between the host and the container.
+
 Note: the container needs access to X11 socket for GUI apps to run. Sharing Display env + X11 socket and granting access to it with SELinux label.
 
 ```
