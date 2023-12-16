@@ -10,7 +10,7 @@ Install the application with [Podman](https://docs.fedoraproject.org/en-US/neuro
 
 Note you need to **accept EULA (End-User-License-Agreement)** from Cisco to install the software on your system. A **dialog will show up** during the installation.
 
-# build.sh script:
+# build.sh script
 
 The script will run a container then create a local image with Packet Tracer installed. 
 
