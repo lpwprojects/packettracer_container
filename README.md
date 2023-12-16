@@ -1,6 +1,6 @@
 # Container for Cisco Packet Tracer 8.2.1 with Podman
 
-This is my personal repos to build Packet Tracer container on Fedora (running Xorg not Wayland).
+This is my personal repos to build Packet Tracer container on Fedora (running **Xorg** not Wayland).
 
 - Packet Tracer is only supported on Ubuntu so I'm building a Ubuntu container with Podman. 
 - Packet Tracer has a mandatory login process (skillsforall.com) so I added firefox.
@@ -8,40 +8,42 @@ This is my personal repos to build Packet Tracer container on Fedora (running Xo
 
 Install the application with [Podman](https://docs.fedoraproject.org/en-US/neurofedora/containers/):
 
-# Download Ubuntu package from [skillsforall.com](https://skillsforall.com/resources/lab-downloads):
+Note you need to **accept EULA (End-User-License-Agreement)** from Cisco to install the software on your system. A **dialog will show up** during the installation.
+
+# build.sh script:
+
+The script will run a container then create a local image with Packet Tracer installed. 
+
+You can then use that image to run a container with the application already installed: tags are editable on top of the script (variables).
+
+# Download Ubuntu package from Cisco
+
+Signup or login to [skillsforall.com](https://skillsforall.com/resources/lab-downloads) to download the Ubuntu version.
+
+You should get a .deb file (e.g Packet_Tracer821_amd64_signed.deb).
+
+# build the image
 
 ```
-# Will install current Packet_Tracer821_amd64_signed.deb from the container and accept EULA (End-User-License-Agreement) (needs working tty)
-cp ./Packet_Tracer821_amd64_signed.deb /tmp/share/
+mkdir tmp && cd tmp
+git clone https://github.com/lpwprojects/packettracer_container.git . 
+cp ~/Downloads/Packet_Tracer821_amd64_signed.deb .
+chmod +x ./build.sh
+./build.sh
 ```
 
-# Build the image and start new container
-
-Adding a shared volume to the container to install the app and also share files between the host and the container.
-
-Note: the container needs access to X11 socket for GUI apps to run. Sharing Display env + X11 socket and granting access to it with SELinux label.
+# Create new container from local image with the application
 
 ```
-podman build -t img_packettracer -f dockerfile .
-podman run --name c_packettracer -dt -e DISPLAY -v /tmp/share:/SHARE:Z -v /tmp/.X11-unix:/tmp/.X11-unix --security-opt label=type:container_runtime_t img_packettracer
+# Example with shared volume '/home/share' from host as '/SHARE' inside container (e.g import labs you download into Packet Tracer)
+podman run --name <CONTAINER NAME> -dt -e DISPLAY -v /home/share:/SHARE:Z -v /tmp/.X11-unix:/tmp/.X11-unix --security-opt label=type:container_runtime_t <LOCAL IMAGE NAME>
 ```
 
-# Install the app
+# Run the application
 
 ```
-podman exec -t -i c_packettracer /bin/bash
-cp /SHARE/Packet_Tracer821_amd64_signed.deb .
-apt install ./Packet_Tracer821_amd64_signed.deb
-[...]
-exit
-```
-# Run the app
+podman exec <CONTAINER NAME> packettracer
 
-```
-# bashr: alias packettracer='podman start c_packettracer && podman exec c_packettracer packettracer ; podman stop c_packettracer'
-
-podman start c_packettracer
-podman exec c_packettracer packettracer
-# podman stop c_packettracer
+# ==> bashr: alias packettracer='podman start <CONTAINER NAME> && podman exec <CONTAINER NAME> packettracer ; podman stop <CONTAINER NAME>'
 ```
 
