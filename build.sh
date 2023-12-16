@@ -34,6 +34,10 @@ fi
 
 echo -e "\n\n"
 echo "====================================="
+echo "==> Created local image:"
+podman images | head -1
+podman images | grep "$IMG"
+echo
 echo "==> Run new container with Packet Trancer and shared volume '/home/share' from host as '/SHARE' inside container:"
 echo "podman run --name $CONT -dt -e DISPLAY -v /home/share:/SHARE:Z -v /tmp/.X11-unix:/tmp/.X11-unix --security-opt label=type:container_runtime_t $IMG"
 echo 
